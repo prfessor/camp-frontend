@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Product } from 'src/app/models/product';
-import {HttpClient} from "@angular/common/http" 
-import { ProductResponseModel } from 'src/app/models/productResponseModel';
+import { ProductService } from 'src/app/services/product.service';
 //httpclient = backend deki dataya ulaşma
 
 
@@ -11,26 +11,49 @@ import { ProductResponseModel } from 'src/app/models/productResponseModel';
   styleUrls: ['./product.component.css']
 })
 export class ProductComponent implements OnInit {
-  apiUrl = "http://localhost:50012/api/products/getall"
-  products: Product[] =
-    []
+  products : Product[] = []
+  dataLoaded = false
+
   // prooductResponseModel:ProductResponseModel={
   //   data:this.products,
   //   message:"",
   //   success:true //data tarifi
   // }
-  constructor(private httpClient:HttpClient) { 
-    
+  constructor(private productService:ProductService, 
+    private activatedroute:ActivatedRoute) {    
   }
 
   ngOnInit(): void {
-    console.log("init çalıştı")
-    this.getProducts()
+      this.activatedroute.params.subscribe(params=>{
+        if(params["categoryId"]) {
+        this.getProductsByCategory(params["categoryId"])
+        }
+        else{
+        this.getProducts()
+        }
+    })
   }
   getProducts() {
-    this.httpClient.get<ProductResponseModel>(this.apiUrl)
-    .subscribe((response)=>{
-      this.products = response.data //gelen response un datası tanımlanan productsa yani Product[] ine eşit
-    }) //fonksiyona üstte tanımlanmış değişken çağırırken this kullanılır.
+    this.productService.getProducts().subscribe(response=>
+    {this.products = response.data
+    this.dataLoaded = true})
+    
   }
+  getProductsByCategory(categoryId:number) {
+    this.productService.getProductsByCategory(categoryId).subscribe(response=>
+    {this.products = response.data
+    this.dataLoaded = true})
+    
+  }
+
+
+  
 }
+
+
+
+
+//this.httpClient.get<ProductResponseModel>(this.apiUrl)
+//.subscribe((response)=>{
+//this.products = response.data //gelen response un datası tanımlanan productsa yani Product[] ine eşit
+//}) //fonksiyona üstte tanımlanmış değişken çağırırken this kullanılır.
