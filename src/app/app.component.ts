@@ -8,8 +8,6 @@ import { Component } from '@angular/core';
 //burası da hangi html dosyasının componenti olduğunu gösteriyor.
 export class AppComponent {
   title = 'northwind';
-  
-
 }
 
 /*burada data yönetiliyor*/
